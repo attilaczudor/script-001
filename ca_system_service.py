@@ -35,6 +35,21 @@ class CASystemCollector:
         return self.last_snapshot
 
 
-def ca_format_metrics(raw_bytes):
-    gb_value = raw_bytes / (1024 ** 3)
-    return f"{gb_value:.2f} GB"
+def ca_format_metrics(raw_bytes, unit="GB", decimal_places=2):
+    divisor_map = {
+        "KB": 1024,
+        "MB": 1024 ** 2,
+        "GB": 1024 ** 3,
+        "TB": 1024 ** 4
+    }
+    divisor = divisor_map.get(unit, 1024 ** 3)
+    converted_value = raw_bytes / divisor
+    return f"{converted_value:.{decimal_places}f} {unit}"
+
+
+def ca_evaluate_load_status(percent_value):
+    if percent_value >= 85.0:
+        return "CRITICAL"
+    if percent_value >= 70.0:
+        return "WARNING"
+    return "NORMAL"
