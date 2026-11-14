@@ -17,7 +17,12 @@ class CASystemCollector:
         }
 
     def get_cpu_usage(self):
-        return 0.0
+        load_percentage = psutil.cpu_percent(interval=None)
+        status_text = ca_evaluate_load_status(load_percentage)
+        return {
+            "percent": load_percentage,
+            "status": status_text
+        }
 
     def get_memory_usage(self):
         return {}
