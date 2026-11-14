@@ -38,7 +38,18 @@ class CASystemCollector:
         }
 
     def get_disk_usage(self):
-        return {}
+        disk_info = psutil.disk_usage(self.partition_path)
+        return {
+            "path": self.partition_path,
+            "total": disk_info.total,
+            "used": disk_info.used,
+            "free": disk_info.free,
+            "percent": disk_info.percent,
+            "formatted_total": ca_format_metrics(disk_info.total),
+            "formatted_used": ca_format_metrics(disk_info.used),
+            "formatted_free": ca_format_metrics(disk_info.free),
+            "status": ca_evaluate_load_status(disk_info.percent)
+        }
 
     def collect_all(self):
         self.last_snapshot = {
