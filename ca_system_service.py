@@ -25,7 +25,17 @@ class CASystemCollector:
         }
 
     def get_memory_usage(self):
-        return {}
+        memory_info = psutil.virtual_memory()
+        return {
+            "total": memory_info.total,
+            "used": memory_info.used,
+            "free": memory_info.available,
+            "percent": memory_info.percent,
+            "formatted_total": ca_format_metrics(memory_info.total),
+            "formatted_used": ca_format_metrics(memory_info.used),
+            "formatted_free": ca_format_metrics(memory_info.available),
+            "status": ca_evaluate_load_status(memory_info.percent)
+        }
 
     def get_disk_usage(self):
         return {}
