@@ -34,6 +34,15 @@ class CASystemCollector:
         }
         return self.last_snapshot
 
+    def save_snapshot_to_file(self, target_filepath=None):
+        if not self.last_snapshot:
+            self.collect_all()
+        if not target_filepath:
+            target_filepath = "ca_system_metrics_snapshot.json"
+        with open(target_filepath, "w", encoding="utf-8") as output_file:
+            json.dump(self.last_snapshot, output_file, indent=4)
+        return os.path.abspath(target_filepath)
+
 
 def ca_format_metrics(raw_bytes, unit="GB", decimal_places=2):
     divisor_map = {
