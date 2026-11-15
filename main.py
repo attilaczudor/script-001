@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from ca_system_service import CASystemCollector, ca_format_metrics
 
 
@@ -7,8 +7,8 @@ class CASystemApp:
     def __init__(self, master_window):
         self.master = master_window
         self.master.title("CA System Monitor - Dunaújvárosi Egyetem")
-        self.master.geometry("560x580")
-        self.master.minsize(520, 520)
+        self.master.geometry("580x620")
+        self.master.minsize(540, 540)
         self.collector = CASystemCollector()
         self.auto_refresh_enabled = tk.BooleanVar(value=True)
 
@@ -121,6 +121,16 @@ class CASystemApp:
         )
         self.refresh_button.pack(side=tk.LEFT)
 
+        self.export_button = tk.Button(
+            self.control_frame,
+            text="Pillanatkép mentése",
+            command=self.on_export_snapshot,
+            font=("Helvetica", 10),
+            padx=10,
+            pady=4
+        )
+        self.export_button.pack(side=tk.LEFT, padx=(10, 0))
+
         self.auto_check = tk.Checkbutton(
             self.control_frame,
             text="Automatikus frissítés (2 mp)",
@@ -137,6 +147,14 @@ class CASystemApp:
             fg="dim gray"
         )
         self.last_update_label.pack(side=tk.RIGHT)
+
+        self.export_info_label = tk.Label(
+            self.main_container,
+            text="",
+            font=("Helvetica", 9),
+            fg="navy"
+        )
+        self.export_info_label.pack(anchor="w", pady=(4, 0))
 
         self.on_manual_refresh()
         self.schedule_next_poll()
@@ -177,6 +195,17 @@ class CASystemApp:
 
         self.last_update_label.config(
             text=f"Utolsó frissítés: {data['platform']['timestamp']}"
+        )
+
+    def on_export_snapshot(self):
+        saved_path = self.collector.save_snapshot_to_file()
+        file_basename = "ca_system_metrics_snapshot.json"
+        self.export_info_label.config(
+            text=f"Sikeres exportálás: {file_basename}"
+        )
+        messagebox.showinfo(
+            "Pillanatkép mentve",
+            f"A telemetriai adatok elmentve:\n{saved_path}"
         )
 
     def toggle_auto_refresh(self):
