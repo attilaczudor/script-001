@@ -10,6 +10,7 @@ class CASystemApp:
         self.master.geometry("560x580")
         self.master.minsize(520, 520)
         self.collector = CASystemCollector()
+        self.auto_refresh_enabled = tk.BooleanVar(value=True)
 
         self.main_container = tk.Frame(self.master, padx=16, pady=16)
         self.main_container.pack(fill=tk.BOTH, expand=True)
@@ -120,6 +121,15 @@ class CASystemApp:
         )
         self.refresh_button.pack(side=tk.LEFT)
 
+        self.auto_check = tk.Checkbutton(
+            self.control_frame,
+            text="Automatikus frissítés (2 mp)",
+            variable=self.auto_refresh_enabled,
+            command=self.toggle_auto_refresh,
+            font=("Helvetica", 9)
+        )
+        self.auto_check.pack(side=tk.LEFT, padx=(10, 0))
+
         self.last_update_label = tk.Label(
             self.control_frame,
             text="Utolsó frissítés: -",
@@ -129,6 +139,7 @@ class CASystemApp:
         self.last_update_label.pack(side=tk.RIGHT)
 
         self.on_manual_refresh()
+        self.schedule_next_poll()
 
     def get_status_color(self, status):
         if status == "CRITICAL":
@@ -167,6 +178,19 @@ class CASystemApp:
         self.last_update_label.config(
             text=f"Utolsó frissítés: {data['platform']['timestamp']}"
         )
+
+    def toggle_auto_refresh(self):
+        if self.auto_refresh_enabled.get():
+            self.schedule_next_poll()
+
+    def schedule_next_poll(self):
+        if self.auto_refresh_enabled.get():
+            self.master.after(2000, self.auto_poll_task)
+
+    def auto_poll_task(self):
+        if self.auto_refresh_enabled.get():
+            self.on_manual_refresh()
+            self.schedule_next_poll()
 
 
 if __name__ == "__main__":
