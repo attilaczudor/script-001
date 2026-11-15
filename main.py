@@ -107,6 +107,67 @@ class CASystemApp:
         )
         self.disk_status_label.pack(anchor="w", pady=(2, 0))
 
+        self.control_frame = tk.Frame(self.main_container, pady=12)
+        self.control_frame.pack(fill=tk.X)
+
+        self.refresh_button = tk.Button(
+            self.control_frame,
+            text="Frissítés most",
+            command=self.on_manual_refresh,
+            font=("Helvetica", 10, "bold"),
+            padx=10,
+            pady=4
+        )
+        self.refresh_button.pack(side=tk.LEFT)
+
+        self.last_update_label = tk.Label(
+            self.control_frame,
+            text="Utolsó frissítés: -",
+            font=("Helvetica", 9),
+            fg="dim gray"
+        )
+        self.last_update_label.pack(side=tk.RIGHT)
+
+        self.on_manual_refresh()
+
+    def get_status_color(self, status):
+        if status == "CRITICAL":
+            return "firebrick"
+        if status == "WARNING":
+            return "dark orange"
+        return "forest green"
+
+    def on_manual_refresh(self):
+        data = self.collector.collect_all()
+
+        self.cpu_percent_label.config(
+            text=f"CPU Terheltség: {data['cpu']['percent']:.1f}%"
+        )
+        self.cpu_status_label.config(
+            text=f"Állapot: {data['cpu']['status']}",
+            fg=self.get_status_color(data['cpu']['status'])
+        )
+
+        self.memory_details_label.config(
+            text=f"Használat: {data['memory']['formatted_used']} / {data['memory']['formatted_total']} ({data['memory']['percent']:.1f}%)"
+        )
+        self.memory_status_label.config(
+            text=f"Állapot: {data['memory']['status']}",
+            fg=self.get_status_color(data['memory']['status'])
+        )
+
+        self.disk_details_label.config(
+            text=f"Tárhely: {data['disk']['formatted_used']} / {data['disk']['formatted_total']} ({data['disk']['percent']:.1f}%)"
+        )
+        self.disk_status_label.config(
+            text=f"Állapot: {data['disk']['status']}",
+            fg=self.get_status_color(data['disk']['status'])
+        )
+
+        self.last_update_label.config(
+            text=f"Utolsó frissítés: {data['platform']['timestamp']}"
+        )
+
 
 if __name__ == "__main__":
     root = tk.Tk()
