@@ -190,8 +190,9 @@ class CASystemApp:
             fg=self.get_status_color(data['memory']['status'])
         )
 
+        free_disk_readable = ca_format_metrics(data["disk"]["free"])
         self.disk_details_label.config(
-            text=f"Tárhely: {data['disk']['formatted_used']} / {data['disk']['formatted_total']} ({data['disk']['percent']:.1f}%)"
+            text=f"Tárhely: {data['disk']['formatted_used']} / {data['disk']['formatted_total']} ({data['disk']['percent']:.1f}%) | Szabad: {free_disk_readable}"
         )
         self.disk_status_label.config(
             text=f"Állapot: {data['disk']['status']}",
